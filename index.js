@@ -6,7 +6,9 @@ const archiver = require('archiver');
 /** Google Service Account credentials  encoded in base64 */
 const credentials = actions.getInput('credentials', { required: true });
 /** Google Drive Folder ID to upload the file/folder to */
-const folder = actions.getInput('folder', { required: true });
+const folder = actions.getInput('folder', { required: false });
+/** Google Drive File ID to upload the file/folder to (will replace) */
+const fileId = actions.getInput('fileId', { required: false });
 /** Local path to the file/folder to upload */
 const target = actions.getInput('target', { required: true });
 /** Optional name for the zipped file */
@@ -71,15 +73,28 @@ function zipDirectory(source, out) {
  */
 function uploadToDrive() {
   actions.info('Uploading file to Goole Drive...');
-  drive.files.create({
-    requestBody: {
-      name: filename,
-      parents: [folder]
-    },
-    media: {
-      body: fs.createReadStream(`${name || target}${fs.lstatSync(target).isDirectory() ? '.zip' : ''}`)
-    }
-  }).then(() => actions.info('File uploaded successfully'))
+
+  const media = {
+    body: fs.createReadStream(`${name || target}${fs.lstatSync(target).isDirectory() ? '.zip' : ''}`)
+  }
+
+  let upload
+  if(fileId) {
+    upload = drive.files.update({
+      fileId,
+      media
+    });
+  } else {
+    upload = drive.files.create({
+      requestBody: {
+        name: filename,
+        parents: [folder]
+      },
+      media
+    })
+  }
+
+  upload.then(() => actions.info('File uploaded successfully'))
     .catch(e => {
       actions.error('Upload failed');
       throw e;

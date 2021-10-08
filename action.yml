@@ -23,7 +23,7 @@ outputs:
     description: 'A link to the Drive folder'
 runs:
   using: 'node12'
-  main: 'index.js'
+  main: 'dist/index.js'
 branding:
   icon: 'upload-cloud'  
   color: 'orange'

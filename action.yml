@@ -7,7 +7,10 @@ inputs:
     required: true
   folder:
     description: 'Google Drive folder ID to upload the file/folder to'
-    required: true
+    required: false
+  fileId:
+    description: 'Google Drive file ID to upload the file/folder to'
+    required: false
   target:
     description: 'Local path to the file/folder to upload'
     required: true
@@ -20,7 +23,7 @@ outputs:
     description: 'A link to the Drive folder'
 runs:
   using: 'node12'
-  main: 'dist/index.js'
+  main: 'index.js'
 branding:
   icon: 'upload-cloud'  
   color: 'orange'
